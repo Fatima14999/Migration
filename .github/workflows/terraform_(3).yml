@@ -1,0 +1,19 @@
+name: Migration_Git/Terraform_(3)
+on:
+  push:
+    branches:
+    - main
+env:
+  DOCKER_HUB_USERNAME: fatimamustafaoo
+  MESSAGE: Welcome to Azure Pipelines
+  NAME: Hareem
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Print Variables
+      run: |-
+        echo "Hello ${{ env.NAME }}"
+        echo "${{ env.MESSAGE }}"

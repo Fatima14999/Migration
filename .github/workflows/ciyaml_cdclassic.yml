@@ -1,0 +1,28 @@
+name: CIYaml_CDClassic/CIYaml_CDClassic
+on:
+  push:
+    branches:
+    - main
+env:
+  pythonVersion: '3.11'
+jobs:
+  BuildJob:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: "${{ env.pythonVersion }}"
+    - name: Install dependencies
+      run: |-
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Basic validation
+      run: python -c "import flask; print('Flask OK')"
+    - name: Zip files
+      run: 7z u ${{ runner.temp }}/app.zip ./${{ github.workspace }}/*
+    - uses: actions/upload-artifact@v4.1.0
+      with:
+        name: drop1
+        path: "${{ runner.temp }}"

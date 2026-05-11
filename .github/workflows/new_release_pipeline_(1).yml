@@ -1,0 +1,62 @@
+name: CIYaml_CDClassic/New_release_pipeline_(1)
+on:
+  workflow_dispatch:
+jobs:
+  Stage-1:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: "${{ github.ref }}"
+      cancel-in-progress: false
+    if: github.event_type != 'pull_request'
+    steps:
+#     # This item has no matching transformer
+#     - taskId: 497d490f-eea7-4f2b-ab94-48d9c1acdcb1
+#       version: 5.*
+#       name: 'Azure App Service Deploy: azure-webapp'
+#       refName: ''
+#       enabled: true
+#       alwaysRun: false
+#       continueOnError: false
+#       timeoutInMinutes: 0
+#       retryCountOnTaskFailure: 0
+#       definitionType: task
+#       overrideInputs: {}
+#       condition: succeeded()
+#       environment: {}
+#       inputs:
+#         ConnectionType: AzureRM
+#         ConnectedServiceName: 59412e03-613c-4c4c-b468-0dab3da28168
+#         PublishProfilePath: "${{ github.workspace }}/**/*.pubxml"
+#         PublishProfilePassword:
+#         WebAppKind: webApp
+#         WebAppName: azure-webapp
+#         DeployToSlotOrASEFlag: false
+#         ResourceGroupName:
+#         SlotName: production
+#         DockerNamespace:
+#         DockerRepository:
+#         DockerImageTag:
+#         VirtualApplication:
+#         Package: "${{ github.workspace }}/_CIYaml_CDClassic/drop1"
+#         RuntimeStack:
+#         RuntimeStackFunction:
+#         StartupCommand:
+#         ScriptType:
+#         InlineScript: ":: You can provide your deployment commands here. One command per line."
+#         ScriptPath:
+#         WebConfigParameters:
+#         AppSettings:
+#         ConfigurationSettings:
+#         UseWebDeploy: false
+#         DeploymentType: webDeploy
+#         TakeAppOfflineFlag: true
+#         SetParametersFile:
+#         RemoveAdditionalFilesFlag: false
+#         ExcludeFilesFromAppDataFlag: true
+#         AdditionalArguments: "-retryAttempts:6 -retryInterval:10000"
+#         RenameFilesFlag: true
+#         XmlTransformation: false
+#         XmlVariableSubstitution: false
+#         JSONFiles:
+#         DeploymentTypeLinux: oneDeploy
+#         CleanDeploymentFlag: true

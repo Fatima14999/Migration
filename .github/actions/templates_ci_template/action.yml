@@ -1,0 +1,19 @@
+name: templates_ci_template
+runs:
+  using: composite
+  steps:
+  # NuGet does not accept glob patterns. Consider specifying files directly or using a solution.
+  - run: nuget restore **/*.sln
+    shell: bash
+  - name: install msbuild
+    uses: microsoft/setup-msbuild@v1.3.1
+  - name: run msbuild
+    run: msbuild **/*.sln -p:Configuration=Release
+    shell: bash
+  - uses: microsoft/vstest-action@v1.0.0
+    with:
+      testAssembly: |-
+        **\*test*.dll
+        !**\*TestAdapter.dll
+        !**\obj\**
+      searchFolder: "${{ github.workspace }}"

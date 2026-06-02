@@ -1,0 +1,25 @@
+name: CI_CD_Classic/CI_CD_Classic-CI
+on:
+  workflow_dispatch:
+env:
+  system_debug: 'false'
+jobs:
+  Job_1:
+    env:
+      DOCKER_DOCKER_USERNAME: fatimamustafaoo
+    name: Agent job 1
+    runs-on:
+      - self-hosted
+      - Default
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: buildAndPush
+      uses: docker/login-action@v3.0.0
+      with:
+        username: "${{ env.DOCKER_DOCKER_USERNAME }}"
+        password: "${{ secrets.DOCKER_DOCKER_PASSWORD }}"
+    - name: buildAndPush
+      run: docker build . --file "Dockerfile" -t python-docker-app/Dockerfile:${{ github.run_id }}
+    - name: buildAndPush
+      run: docker push python-docker-app/Dockerfile:${{ github.run_id }}

@@ -1,0 +1,85 @@
+name: CI_CD_Classic/Python
+on:
+  push:
+    branches:
+    - main
+env:
+  system_debug: false
+jobs:
+  BuildJob:
+    name: Build Application
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Use Python 3.11
+      uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.11'
+    - name: Install Dependencies
+      run: pip install -r requirements.txt
+    - name: Validate Python File
+      run: python -m py_compile app.py
+    # The following script preserves the globbing behavior of the CopyFiles task.
+    # Refer to this transformer's documentation for an alternative that will work in simple cases.
+    - name: Copy Files
+      uses: actions/github-script@v7.0.0
+      env:
+        TARGET_FOLDER: "${{ runner.temp }}"
+        SOURCE_FOLDER: "${{ github.workspace }}"
+        CONTENTS: "**"
+      with:
+        github-token: "${{ secrets.GITHUB_TOKEN }}"
+        script: |-
+          const fs = require('fs').promises
+          const path = require('path')
+          const target = path.resolve(process.env.TARGET_FOLDER)
+          process.chdir(process.env.SOURCE_FOLDER || '.')
+          if (process.env.CLEAN_TARGET_FOLDER === 'true') await io.rmRF(target)
+          const flattenFolders = process.env.FLATTEN_FOLDERS === 'true'
+          const options = {force: process.env.OVERWRITE === 'true'}
+          const globber = await glob.create(process.env.CONTENTS || '**')
+          for await (const file of globber.globGenerator()) {
+            if ((await fs.lstat(file)).isDirectory()) continue
+            const filename = flattenFolders ? path.basename(file) : file.substring(process.cwd().length)
+            const dest = path.join(target, filename)
+            await io.mkdirP(path.dirname(dest))
+            await io.cp(file, dest, options)
+          }
+    - name: Zip files
+      run: 7z u ${{ runner.temp }}/app.zip ./${{ runner.temp }}/*
+    - name: Publish Artifact
+      uses: actions/upload-artifact@v4.1.0
+      with:
+        name: drop
+        path: "${{ runner.temp }}/app.zip"
+  TestJob:
+    name: Run Validation on Another Pool
+    needs:
+    - BuildJob
+    runs-on:
+      - self-hosted
+      - Azure-pipeline
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/download-artifact@v4.1.0
+      with:
+        name: drop
+    - name: Verify Artifact
+      run: |-
+        echo "Running from another agent pool"
+        ls
+  TestJob3:
+    name: Run Validation on Another Pool
+    needs:
+    - BuildJob
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/download-artifact@v4.1.0
+      with:
+        name: drop
+    - name: Verify Artifact
+      run: "echo \"Running from another agent pool\"\nls\n      "
